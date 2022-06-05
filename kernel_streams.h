@@ -48,7 +48,7 @@ typedef struct file_control_block
 
 
 
-/** 
+/**
   @brief Initialization for files and streams.
 
   This function is called at kernel startup.
@@ -57,7 +57,7 @@ void initialize_files();
 
 
 /**
-	@brief Increase the reference count of an fcb 
+	@brief Increase the reference count of an fcb
 
 	@param fcb the fcb whose reference count will be increased
 */
@@ -67,9 +67,9 @@ void FCB_incref(FCB* fcb);
 /**
 	@brief Decrease the reference count of the fcb.
 
-	If the reference count drops to 0, release the FCB, calling the 
+	If the reference count drops to 0, release the FCB, calling the
 	Close method and returning its return value.
-	If the reference count is still >0, return 0. 
+	If the reference count is still >0, return 0.
 
 	@param fcb  the fcb whose reference count is decreased
 	@returns if the reference count is still >0, return 0, else return the value returned by the
@@ -81,7 +81,7 @@ int FCB_decref(FCB* fcb);
 /** @brief Acquire a number of FCBs and corresponding fids.
 
    Given an array of fids and an array of pointers to FCBs  of
-   size @ num, this function will check is available resources
+   size @ num, this function will check if available resources
    in the current process PCB and FCB are available, and if so
    it will fill the two arrays with the appropriate values.
    If not, the state is unchanged (but the array contents
@@ -100,11 +100,11 @@ int FCB_reserve(size_t num, Fid_t *fid, FCB** fcb);
 
 /** @brief Release a number of FCBs and corresponding fids.
 
-   Given an array of fids of size @ num, this function will 
+   Given an array of fids of size @ num, this function will
    return the fids to the free pool of the current process and
    release the corresponding FCBs.
 
-   This is the opposite of operation @ref FCB_reserve. 
+   This is the opposite of operation @ref FCB_reserve.
    Note that this is very different from closing open fids.
    No I/O operation is performed by this function.
 

@@ -13,7 +13,7 @@
   process access.
 
   @{
-*/ 
+*/
 
 #include "tinyos.h"
 #include "kernel_sched.h"
@@ -57,7 +57,7 @@ typedef struct process_control_block {
   rlnode children_node;   /**< @brief Intrusive node for @c children_list */
   rlnode exited_node;     /**< @brief Intrusive node for @c exited_list */
 
-  CondVar child_exit;     /**< @brief Condition variable for @c WaitChild. 
+  CondVar child_exit;     /**< @brief Condition variable for @c WaitChild.
 
                              This condition variable is  broadcast each time a child
                              process terminates. It is used in the implementation of
@@ -67,6 +67,11 @@ typedef struct process_control_block {
 
 } PCB;
 
+typedef struct process_info_control_block
+{
+  procinfo cur_info;
+  int cursor;
+} PROCCB;
 
 /**
   @brief Initialize the process table.
@@ -79,11 +84,11 @@ void initialize_processes();
 /**
   @brief Get the PCB for a PID.
 
-  This function will return a pointer to the PCB of 
+  This function will return a pointer to the PCB of
   the process with a given PID. If the PID does not
   correspond to a process, the function returns @c NULL.
 
-  @param pid the pid of the process 
+  @param pid the pid of the process
   @returns A pointer to the PCB of the process, or NULL.
 */
 PCB* get_pcb(Pid_t pid);
@@ -91,11 +96,11 @@ PCB* get_pcb(Pid_t pid);
 /**
   @brief Get the PID of a PCB.
 
-  This function will return the PID of the process 
+  This function will return the PID of the process
   whose PCB is pointed at by @c pcb. If the pcb does not
   correspond to a process, the function returns @c NOPROC.
 
-  @param pcb the pcb of the process 
+  @param pcb the pcb of the process
   @returns the PID of the process, or NOPROC.
 */
 Pid_t get_pid(PCB* pcb);

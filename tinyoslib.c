@@ -1,5 +1,3 @@
-
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
@@ -13,12 +11,12 @@
 
 static ssize_t tinyos_fid_read(void *cookie, char *buf, size_t size)
 {
-	return Read(*(Fid_t*)cookie, buf, size); 
+	return Read(*(Fid_t*)cookie, buf, size);
 }
 
 static ssize_t tinyos_fid_write(void *cookie, const char *buf, size_t size)
 {
-	int ret = Write(*(Fid_t*)cookie, buf, size); 
+	int ret = Write(*(Fid_t*)cookie, buf, size);
 	return (ret<0) ? 0 : ret;
 }
 
@@ -41,7 +39,7 @@ static FILE* get_std_stream(int fid, const char* mode)
 	FILE* term = fidopen(fid, mode);
 	assert(term);
 	/* This is glibc-specific and tunrs off fstream locking */
-	__fsetlocking(term, FSETLOCKING_BYCALLER);	
+	__fsetlocking(term, FSETLOCKING_BYCALLER);
 	return term;
 }
 
@@ -78,12 +76,12 @@ void tinyos_replace_stdio()
 
 void tinyos_restore_stdio()
 {
-	if(saved_out == NULL)  return;	
+	if(saved_out == NULL)  return;
 
 	fclose(stdin);
 	fclose(stdout);
 
-	stdin = saved_in; 
+	stdin = saved_in;
 	stdout = saved_out;
 
 	saved_in = saved_out = NULL;
@@ -118,7 +116,7 @@ int ParseProcInfo(procinfo* pinfo, Program* prog, int argc, const char** argv )
 		/* We do not recognize the format! */
 		return -1;
 
-	if(pinfo->argl > PROCINFO_MAX_ARGS_SIZE) 
+	if(pinfo->argl > PROCINFO_MAX_ARGS_SIZE)
 		/* The full argument is not available */
 		return -1;
 
@@ -139,14 +137,14 @@ int ParseProcInfo(procinfo* pinfo, Program* prog, int argc, const char** argv )
 		argvunpack(argc, argv, argl, args);
 	}
 
-	return N;		
+	return N;
 }
 
 
 
 int Execute(Program prog, size_t argc, const char** argv)
 {
-	/* We will pack the prog pointer and the arguments to 
+	/* We will pack the prog pointer and the arguments to
 	  an argument buffer.
 	  */
 
@@ -166,3 +164,25 @@ int Execute(Program prog, size_t argc, const char** argv)
 	return Exec(exec_wrapper, argl, args);
 }
 
+
+
+void BarrierSync(barrier* bar, unsigned int n)
+{
+	assert(n>0);
+	Mutex_Lock(& bar->mx);
+
+	int epoch = bar->epoch;
+	assert(bar->count < n);
+
+	bar->count ++;
+	if(bar->count == n) {
+		bar->epoch ++;
+		bar->count = 0;
+		Cond_Broadcast(&bar->cv);
+	}
+
+	while(epoch == bar->epoch)
+		Cond_Wait(&bar->mx, &bar->cv);
+
+	Mutex_Unlock(& bar->mx);
+}
